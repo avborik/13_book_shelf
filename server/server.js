@@ -2,21 +2,42 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
-const config = require('./config/config').get(process.env.NODE_ENV)
+const config = require('./config/config').get(process.env.NODE_ENV);
 const app = express();
 
-mongoose.Promise = global.Promise
+mongoose.Promise = global.Promise;
 mongoose.connect(config.DATABASE)
 
-const {User} = require('./models/user');
-const {Book} = require('./models/book');
+const { User } = require('./models/user'); 
+const { Book } = require('./models/book');
+const { auth} = require('./middleware/auth')
 
 app.use(bodyParser.json());
 app.use(cookieParser());
 
 // GET //
+app.get('/api/auth',auth,(req,res)=>{
+    res.json({
+        isAuth:true,
+        id:req.user._id,
+        email:req.user.email,
+        name:req.user.name,
+        lastname:req.user.lastname
+    })
+});
+
+
+app.get('/api/logout',auth,(req,res)=>{
+    req.user.deleteToken(req.token,(err,user)=>{
+        if(err) return res.status(400).send(err);
+        res.sendStatus(200)
+    })
+})
+
+
 app.get('/api/getBook',(req,res)=>{
     let id = req.query.id;
+
     Book.findById(id,(err,doc)=>{
         if(err) return res.status(400).send(err);
         res.send(doc);
@@ -24,10 +45,12 @@ app.get('/api/getBook',(req,res)=>{
 })
 
 app.get('/api/books',(req,res)=>{
+    // locahost:3001/api/books?skip=3&limit=2&order=asc
     let skip = parseInt(req.query.skip);
     let limit = parseInt(req.query.limit);
     let order = req.query.order;
 
+    // ORDER = asc || desc
     Book.find().skip(skip).sort({_id:order}).limit(limit).exec((err,doc)=>{
         if(err) return res.status(400).send(err);
         res.send(doc);
@@ -41,7 +64,7 @@ app.get('/api/getReviewer',(req,res)=>{
         if(err) return res.status(400).send(err);
         res.json({
             name: doc.name,
-            lastnaem: doc.lastname
+            lastname: doc.lastname
         })
     })
 })
@@ -52,6 +75,14 @@ app.get('/api/users',(req,res)=>{
         res.status(200).send(users)
     })
 })
+
+app.get('/api/user_posts',(req,res)=>{
+    Book.find({ownerId:req.query.user}).exec((err,docs)=>{
+        if(err) return res.status(400).send(err);
+        res.send(docs)
+    })
+})
+
 
 // POST //
 app.post('/api/book',(req,res)=>{
@@ -100,6 +131,8 @@ app.post('/api/login',(req,res)=>{
     })
 })
 
+
+
 // UPDATE //
 app.post('/api/book_update',(req,res)=>{
     Book.findByIdAndUpdate(req.body._id,req.body,{new:true},(err,doc)=>{
@@ -112,6 +145,7 @@ app.post('/api/book_update',(req,res)=>{
 })
 
 // DELETE //
+
 app.delete('/api/delete_book',(req,res)=>{
     let id = req.query.id;
 
@@ -121,7 +155,8 @@ app.delete('/api/delete_book',(req,res)=>{
     })
 })
 
+
 const port = process.env.PORT || 3001;
 app.listen(port,()=>{
-    console.log(`SERVER RUNNING`)
+    console.log(`SERVER RUNNNING`)
 })
