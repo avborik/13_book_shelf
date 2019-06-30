@@ -1,7 +1,7 @@
 {
   "name": "13_book_shelf",
   "version": "1.0.0",
-  "description": "final project",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,30 +11,18 @@
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "engines":{
-    "node":"11.6.0"
+    "node":"8.6.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/avborik/13_book_shelf.git"
-  },
-  "keywords": [
-    "book",
-    "shelf"
-  ],
-  "author": "Boris Avdeev",
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/avborik/13_book_shelf/issues"
-  },
-  "homepage": "https://github.com/avborik/13_book_shelf#readme",
   "dependencies": {
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "concurrently": "^3.5.1",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
     "jsonwebtoken": "^8.0.1",
     "moment-js": "^1.1.15",
-    "mongoose": "^5.5.12"
+    "mongoose": "^4.10.8"
   }
 }
